@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Memory Match</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #d9f2d9;
+            text-align: center;
+            padding: 40px;
+        }
+        .card-box {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 420px;
+            margin: auto;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 70px);
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .card {
+            width: 70px;
+            height: 70px;
+            font-size: 30px;
+            border: none;
+            border-radius: 12px;
+            background: #ec4899;
+            color: white;
+            cursor: pointer;
+        }
+        .card.flipped {
+            background: white;
+            color: #111;
+            border: 2px solid #ec4899;
+        }
+        button.restart {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #ec4899;
+            color: white;
+            cursor: pointer;
+        }
+        .back {
+            display: inline-block;
+            margin-top: 20px;
+            color: #2563eb;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="card-box">
+        <h1>Memory Match</h1>
+        <p>Find all matching pairs.</p>
+
+        <div class="grid" id="grid"></div>
+
+        <p id="status">Moves: 0</p>
+
+        <button class="restart" onclick="startGame()">New Game</button>
+
+        <a class="back" href="/">Back to Games</a>
+    </div>
+
+    <script>
+        const emojis = ["🍎", "🍌", "🍇", "🍓", "🍊", "🍉", "🥝", "🍍"];
+        let cards = [];
+        let firstCard = null;
+        let lockBoard = false;
+        let moves = 0;
+        let matchedPairs = 0;
+
+        function startGame() {
+            cards = [...emojis, ...emojis]
+                .sort(() => Math.random() - 0.5);
+
+            firstCard = null;
+            lockBoard = false;
+            moves = 0;
+            matchedPairs = 0;
+
+            document.getElementById("status").innerText = "Moves: 0";
+
+            const grid = document.getElementById("grid");
+            grid.innerHTML = "";
+
+            cards.forEach((emoji) => {
+                const button = document.createElement("button");
+                button.className = "card";
+                button.dataset.emoji = emoji;
+                button.onclick = () => flipCard(button);
+                grid.appendChild(button);
+            });
+        }
+
+        function flipCard(button) {
+            if (lockBoard || button.classList.contains("flipped")) {
+                return;
+            }
+
+            button.classList.add("flipped");
+            button.innerText = button.dataset.emoji;
+
+            if (!firstCard) {
+                firstCard = button;
+                return;
+            }
+
+            moves++;
+            document.getElementById("status").innerText = "Moves: " + moves;
+
+            if (firstCard.dataset.emoji === button.dataset.emoji) {
+                firstCard = null;
+                matchedPairs++;
+
+                if (matchedPairs === emojis.length) {
+                    setTimeout(() => {
+                        alert("You matched all pairs in " + moves + " moves!");
+                    }, 300);
+                }
+
+                return;
+            }
+
+            lockBoard = true;
+
+            setTimeout(() => {
+                firstCard.classList.remove("flipped");
+                firstCard.innerText = "";
+                button.classList.remove("flipped");
+                button.innerText = "";
+                firstCard = null;
+                lockBoard = false;
+            }, 800);
+        }
+
+        startGame();
+    </script>
+</body>
+</html>

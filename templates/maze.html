@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Maze Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #d9f2d9;
+            text-align: center;
+            padding: 40px;
+        }
+        .card-box {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 420px;
+            margin: auto;
+        }
+        #maze {
+            display: grid;
+            grid-template-columns: repeat(10, 28px);
+            gap: 2px;
+            justify-content: center;
+            margin: 20px auto;
+        }
+        .wall {
+            background: #334155;
+        }
+        .path {
+            background: #e2e8f0;
+        }
+        .player {
+            background: #2563eb;
+        }
+        .goal {
+            background: #16a34a;
+        }
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(3, 60px);
+            gap: 8px;
+            justify-content: center;
+        }
+        button {
+            padding: 15px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            background: #64748b;
+            color: white;
+            cursor: pointer;
+        }
+        .back {
+            display: inline-block;
+            margin-top: 20px;
+            color: #2563eb;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="card-box">
+        <h1>Maze Game</h1>
+        <p>Move the blue square to the green square.</p>
+
+        <div id="maze"></div>
+
+        <div class="controls">
+            <span></span>
+            <button onclick="move('up')">↑</button>
+            <span></span>
+
+            <button onclick="move('left')">←</button>
+            <button onclick="move('down')">↓</button>
+            <button onclick="move('right')">→</button>
+        </div>
+
+        <a class="back" href="/">Back to Games</a>
+    </div>
+
+    <script>
+        const maze = [
+            "##########",
+            "#S...#...#",
+            "#.##.#.#.#",
+            "#.#..#.#.#",
+            "#.#.##.#.#",
+            "#.#....#.#",
+            "#.####.#.#",
+            "#......#.#",
+            "#########G",
+            "##########"
+        ];
+
+        let playerX = 1;
+        let playerY = 1;
+
+        function drawMaze() {
+            const mazeDiv = document.getElementById("maze");
+            mazeDiv.innerHTML = "";
+
+            for (let y = 0; y < maze.length; y++) {
+                for (let x = 0; x < maze[y].length; x++) {
+                    const cell = document.createElement("div");
+
+                    if (maze[y][x] === "#") {
+                        cell.className = "wall";
+                    } else if (maze[y][x] === "G") {
+                        cell.className = "goal";
+                    } else if (x === playerX && y === playerY) {
+                        cell.className = "player";
+                    } else {
+                        cell.className = "path";
+                    }
+
+                    mazeDiv.appendChild(cell);
+                }
+            }
+        }
+
+        function move(direction) {
+            let newX = playerX;
+            let newY = playerY;
+
+            if (direction === "up") newY--;
+            if (direction === "down") newY++;
+            if (direction === "left") newX--;
+            if (direction === "right") newX++;
+
+            if (
+                newY >= 0 &&
+                newY < maze.length &&
+                newX >= 0 &&
+                newX < maze[newY].length &&
+                maze[newY][newX] !== "#"
+            ) {
+                playerX = newX;
+                playerY = newY;
+            }
+
+            drawMaze();
+
+            if (maze[playerY][playerX] === "G") {
+                setTimeout(() => {
+                    alert("You reached the goal!");
+                }, 100);
+            }
+        }
+
+        drawMaze();
+    </script>
+</body>
+</html>

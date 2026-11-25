@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Coin Toss</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #d9f2d9;
+            text-align: center;
+            padding: 40px;
+        }
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 420px;
+            margin: auto;
+        }
+        .coin {
+            width: 130px;
+            height: 130px;
+            margin: 30px auto;
+            border-radius: 50%;
+            background: gold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: bold;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
+        button {
+            padding: 15px 25px;
+            font-size: 18px;
+            border: none;
+            border-radius: 10px;
+            background: #0ea5e9;
+            color: white;
+            cursor: pointer;
+        }
+        .message {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .back {
+            display: inline-block;
+            margin-top: 20px;
+            color: #2563eb;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Coin Toss</h1>
+
+        <div class="coin">
+            {% if coin_result %}
+                {{ coin_result }}
+            {% else %}
+                ?
+            {% endif %}
+        </div>
+
+        <p class="message">{{ coin_message }}</p>
+
+        <form action="/coin-toss/flip" method="post">
+            <button type="submit">Toss Coin</button>
+        </form>
+
+        <a class="back" href="/">Back to Games</a>
+    </div>
+</body>
+</html>
