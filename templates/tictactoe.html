@@ -5,7 +5,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: #f4f6f8;
+            background: #d9f2d9;
             text-align: center;
             padding: 40px;
         }
@@ -16,6 +16,23 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             max-width: 420px;
             margin: auto;
+        }
+        .levels {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .levels button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            background: #e5e7eb;
+            cursor: pointer;
+        }
+        .levels button.active {
+            background: #16a34a;
+            color: white;
         }
         .board {
             display: grid;
@@ -63,16 +80,42 @@
 <body>
     <div class="card">
         <h1>Tic Tac Toe</h1>
+        <p>You are X. Computer is O.</p>
+
+        <div class="levels">
+            <form action="/tic-tac-toe/difficulty" method="post">
+                <input type="hidden" name="difficulty" value="easy">
+                <button class="{% if difficulty == 'easy' %}active{% endif %}">
+                    Easy
+                </button>
+            </form>
+
+            <form action="/tic-tac-toe/difficulty" method="post">
+                <input type="hidden" name="difficulty" value="medium">
+                <button class="{% if difficulty == 'medium' %}active{% endif %}">
+                    Medium
+                </button>
+            </form>
+
+            <form action="/tic-tac-toe/difficulty" method="post">
+                <input type="hidden" name="difficulty" value="hard">
+                <button class="{% if difficulty == 'hard' %}active{% endif %}">
+                    Hard
+                </button>
+            </form>
+        </div>
 
         <p class="status">
             {% if game_over %}
                 {% if winner == "Draw" %}
                     It is a draw!
+                {% elif winner == "X" %}
+                    You win!
                 {% else %}
-                    Player {{ winner }} wins!
+                    Computer wins!
                 {% endif %}
             {% else %}
-                Player {{ current_player }}'s turn
+                Your turn
             {% endif %}
         </p>
 
