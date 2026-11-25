@@ -285,3 +285,18 @@ async def quiz_reset():
     quiz_message = "Choose the correct answer."
     quiz_finished = False
     return RedirectResponse(url="/quiz", status_code=303)
+@app.get("/memory-match", response_class=HTMLResponse)
+async def memory_match_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="memory.html",
+        context={"request": request}
+    )
+
+@app.get("/maze", response_class=HTMLResponse)
+async def maze_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="maze.html",
+        context={"request": request}
+    )
