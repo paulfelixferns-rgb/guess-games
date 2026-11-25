@@ -35,32 +35,29 @@ coin_message = "Click Toss Coin to play."
 
 # Quiz Game
 quiz_questions = [
-    {
-        "question": "What is 7 + 8?",
-        "options": ["13", "14", "15", "16"],
-        "answer": "15"
-    },
-    {
-        "question": "Which planet is known as the Red Planet?",
-        "options": ["Earth", "Mars", "Venus", "Jupiter"],
-        "answer": "Mars"
-    },
-    {
-        "question": "What is the capital of India?",
-        "options": ["Mumbai", "Kolkata", "New Delhi", "Chennai"],
-        "answer": "New Delhi"
-    },
-    {
-        "question": "How many days are there in a week?",
-        "options": ["5", "6", "7", "8"],
-        "answer": "7"
-    }
+    {"question": "What is 7 + 8?", "options": ["13", "14", "15", "16"], "answer": "15"},
+    {"question": "Which planet is known as the Red Planet?", "options": ["Earth", "Mars", "Venus", "Jupiter"], "answer": "Mars"},
+    {"question": "What is the capital of India?", "options": ["Mumbai", "Kolkata", "New Delhi", "Chennai"], "answer": "New Delhi"},
+    {"question": "How many days are there in a week?", "options": ["5", "6", "7", "8"], "answer": "7"},
+    {"question": "Which is the largest ocean?", "options": ["Atlantic", "Indian", "Arctic", "Pacific"], "answer": "Pacific"},
+    {"question": "What is 9 × 6?", "options": ["54", "56", "58", "63"], "answer": "54"},
+    {"question": "Which animal is known as the King of the Jungle?", "options": ["Tiger", "Lion", "Elephant", "Leopard"], "answer": "Lion"},
+    {"question": "What color do you get when you mix blue and yellow?", "options": ["Green", "Purple", "Orange", "Brown"], "answer": "Green"},
+    {"question": "How many continents are there?", "options": ["5", "6", "7", "8"], "answer": "7"},
+    {"question": "Which gas do plants absorb?", "options": ["Oxygen", "Nitrogen", "Carbon dioxide", "Hydrogen"], "answer": "Carbon dioxide"},
+    {"question": "What is the boiling point of water in Celsius?", "options": ["50", "80", "100", "120"], "answer": "100"},
+    {"question": "Which is the smallest planet in our solar system?", "options": ["Mercury", "Mars", "Venus", "Pluto"], "answer": "Mercury"},
+    {"question": "What is 100 ÷ 4?", "options": ["20", "25", "30", "40"], "answer": "25"},
+    {"question": "Which bird cannot fly?", "options": ["Eagle", "Penguin", "Parrot", "Sparrow"], "answer": "Penguin"},
+    {"question": "What is the national animal of India?", "options": ["Lion", "Tiger", "Elephant", "Peacock"], "answer": "Tiger"},
+    {"question": "How many players are there in a cricket team?", "options": ["9", "10", "11", "12"], "answer": "11"}
 ]
 
 quiz_index = 0
 quiz_score = 0
 quiz_message = "Choose the correct answer."
 quiz_finished = False
+quiz_game_questions = []
 
 WINNING_COMBINATIONS = [
     [0, 1, 2], [3, 4, 5], [6, 7, 8],
@@ -386,10 +383,15 @@ async def flip_coin():
 
 @app.get("/quiz", response_class=HTMLResponse)
 async def quiz_page(request: Request):
+    global quiz_game_questions
+
+    if not quiz_game_questions:
+        quiz_game_questions = random.sample(quiz_questions, 4)
+
     question = None
 
     if not quiz_finished:
-        question = quiz_questions[quiz_index]
+        question = quiz_game_questions[quiz_index]
 
     return templates.TemplateResponse(
         request=request,
@@ -401,7 +403,7 @@ async def quiz_page(request: Request):
             "quiz_score": quiz_score,
             "quiz_message": quiz_message,
             "quiz_finished": quiz_finished,
-            "total_questions": len(quiz_questions)
+            "total_questions": len(quiz_game_questions)
         }
     )
 
@@ -410,7 +412,7 @@ async def quiz_answer(request: Request, answer: str = Form(...)):
     global quiz_index, quiz_score, quiz_message, quiz_finished
 
     if not quiz_finished:
-        correct_answer = quiz_questions[quiz_index]["answer"]
+        correct_answer = quiz_game_questions[quiz_index]["answer"]
 
         if answer == correct_answer:
             quiz_score += 1
@@ -420,19 +422,22 @@ async def quiz_answer(request: Request, answer: str = Form(...)):
 
         quiz_index += 1
 
-        if quiz_index >= len(quiz_questions):
+        if quiz_index >= len(quiz_game_questions):
             quiz_finished = True
-            quiz_message = f"Quiz finished! Your score is {quiz_score} out of {len(quiz_questions)}."
+            quiz_message = f"Quiz finished! Your score is {quiz_score} out of {len(quiz_game_questions)}."
 
     return RedirectResponse(url="/quiz", status_code=303)
 
 @app.post("/quiz/reset")
 async def quiz_reset():
-    global quiz_index, quiz_score, quiz_message, quiz_finished
+    global quiz_index, quiz_score, quiz_message, quiz_finished, quiz_game_questions
+
+    quiz_game_questions = random.sample(quiz_questions, 4)
     quiz_index = 0
     quiz_score = 0
     quiz_message = "Choose the correct answer."
     quiz_finished = False
+
     return RedirectResponse(url="/quiz", status_code=303)
 
 @app.get("/memory-match", response_class=HTMLResponse)
@@ -452,6 +457,24 @@ async def maze_page(request: Request):
     )
 @app.get("/chess", response_class=HTMLResponse)
 async def chess_page(request: Request):
+    selected_square = request.query_params.get("selected")
+
+    selected = None
+    legal_moves = []
+
+    if selected_square is not None:
+        try:
+            selected = int(selected_square)
+
+            if chess_board.piece_at(selected) and chess_board.piece_at(selected).color == chess.WHITE:
+                legal_moves = [
+                    move.to_square
+                    for move in chess_board.legal_moves
+                    if move.from_square == selected
+                ]
+        except:
+            selected = None
+
     return templates.TemplateResponse(
         request=request,
         name="chess.html",
@@ -460,7 +483,9 @@ async def chess_page(request: Request):
             "board": chess_board,
             "message": chess_message,
             "difficulty": chess_difficulty,
-            "game_over": chess_game_over
+            "game_over": chess_game_over,
+            "selected": selected,
+            "legal_moves": legal_moves
         }
     )
 
@@ -470,6 +495,44 @@ async def set_chess_difficulty(request: Request, difficulty: str = Form(...)):
     chess_difficulty = difficulty
     return RedirectResponse(url="/chess", status_code=303)
 
+@app.get("/chess/select/{square}")
+async def select_chess_piece(request: Request, square: int):
+    return RedirectResponse(url=f"/chess?selected={square}", status_code=303)
+
+@app.get("/chess/move/{square}")
+async def make_chess_move(request: Request, square: int):
+    global chess_board, chess_message, chess_game_over
+
+    selected_square = request.query_params.get("selected")
+
+    if selected_square is None:
+        return RedirectResponse(url="/chess", status_code=303)
+
+    selected_square = int(selected_square)
+
+    move = chess.Move(selected_square, square)
+
+    if move in chess_board.legal_moves:
+        chess_board.push(move)
+
+        if not chess_board.is_game_over():
+            computer_chess_move()
+
+        if chess_board.is_checkmate():
+            chess_message = "Checkmate! Computer wins."
+            chess_game_over = True
+        elif chess_board.is_stalemate():
+            chess_message = "Stalemate! The game is a draw."
+            chess_game_over = True
+        elif chess_board.is_check():
+            chess_message = "Your king is in check!"
+        else:
+            chess_message = "Your move."
+    else:
+        chess_message = "That is not a legal move. Try again."
+
+    return RedirectResponse(url="/chess", status_code=303)
+
 @app.post("/chess/reset")
 async def reset_chess():
     global chess_board, chess_message, chess_game_over
@@ -477,3 +540,66 @@ async def reset_chess():
     chess_message = "New chess game started. You are White."
     chess_game_over = False
     return RedirectResponse(url="/chess", status_code=303)
+
+
+def computer_chess_move():
+    global chess_message
+
+    legal_moves = list(chess_board.legal_moves)
+
+    if not legal_moves:
+        return
+
+    if chess_difficulty == "easy":
+        move = random.choice(legal_moves)
+
+    elif chess_difficulty == "medium":
+        capture_moves = [
+            move for move in legal_moves
+            if chess_board.is_capture(move)
+        ]
+
+        if capture_moves:
+            move = random.choice(capture_moves)
+        else:
+            move = random.choice(legal_moves)
+
+    else:
+        best_move = None
+        best_score = -9999
+
+        for move in legal_moves:
+            chess_board.push(move)
+            score = -evaluate_chess_board()
+            chess_board.pop()
+
+            if score > best_score:
+                best_score = score
+                best_move = move
+
+        move = best_move if best_move else random.choice(legal_moves)
+
+    chess_board.push(move)
+
+
+def evaluate_chess_board():
+    piece_values = {
+        chess.PAWN: 1,
+        chess.KNIGHT: 3,
+        chess.BISHOP: 3,
+        chess.ROOK: 5,
+        chess.QUEEN: 9,
+        chess.KING: 0
+    }
+
+    score = 0
+
+    for square, piece in chess_board.piece_map().items():
+        value = piece_values[piece.piece_type]
+
+        if piece.color == chess.BLACK:
+            score += value
+        else:
+            score -= value
+
+    return score
