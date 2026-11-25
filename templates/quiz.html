@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quiz Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #d9f2d9;
+            text-align: center;
+            padding: 40px;
+        }
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 450px;
+            margin: auto;
+        }
+        .question {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            font-size: 16px;
+            border: none;
+            border-radius: 10px;
+            background: #f97316;
+            color: white;
+            cursor: pointer;
+        }
+        .green {
+            background: #16a34a;
+        }
+        .back {
+            display: inline-block;
+            margin-top: 20px;
+            color: #2563eb;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Quiz Game</h1>
+
+        <p>{{ quiz_message }}</p>
+        <p>Score: {{ quiz_score }} / {{ total_questions }}</p>
+
+        {% if quiz_finished %}
+            <form action="/quiz/reset" method="post">
+                <button class="green">Play Again</button>
+            </form>
+        {% else %}
+            <p class="question">
+                Question {{ quiz_index + 1 }}: {{ question.question }}
+            </p>
+
+            <form action="/quiz/answer" method="post">
+                {% for option in question.options %}
+                    <button name="answer" value="{{ option }}">
+                        {{ option }}
+                    </button>
+                {% endfor %}
+            </form>
+        {% endif %}
+
+        <a class="back" href="/">Back to Games</a>
+    </div>
+</body>
+</html>
