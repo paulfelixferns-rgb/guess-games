@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chess</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #d9f2d9;
+            text-align: center;
+            padding: 30px;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            max-width: 500px;
+            margin: auto;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(8, 42px);
+            justify-content: center;
+            margin: 20px auto;
+        }
+        .square {
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+        }
+        .light {
+            background: #f0d9b5;
+        }
+        .dark {
+            background: #b58863;
+        }
+        .levels {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .levels button {
+            padding: 10px 15px;
+            font-weight: bold;
+            border: 2px solid #111827;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+        }
+        .levels button.active {
+            background: #111827;
+            color: white;
+        }
+        button.reset {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #16a34a;
+            color: white;
+            cursor: pointer;
+        }
+        .back {
+            display: inline-block;
+            margin-top: 20px;
+            color: #2563eb;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Chess</h1>
+        <p>{{ message }}</p>
+
+        <div class="levels">
+            <form action="/chess/difficulty" method="post">
+                <input type="hidden" name="difficulty" value="easy">
+                <button class="{% if difficulty == 'easy' %}active{% endif %}">Easy</button>
+            </form>
+
+            <form action="/chess/difficulty" method="post">
+                <input type="hidden" name="difficulty" value="medium">
+                <button class="{% if difficulty == 'medium' %}active{% endif %}">Medium</button>
+            </form>
+
+            <form action="/chess/difficulty" method="post">
+                <input type="hidden" name="difficulty" value="hard">
+                <button class="{% if difficulty == 'hard' %}active{% endif %}">Hard</button>
+            </form>
+        </div>
+
+        <div class="board">
+            {% for square in board.squares %}
+                <div class="square {% if (square % 2 == 0 and (square // 8) % 2 == 0) or (square % 2 == 1 and (square // 8) % 2 == 1) %}light{% else %}dark{% endif %}">
+                    {% set piece = board.piece_at(square) %}
+                    {% if piece %}
+                        {{ piece.unicode_symbol() }}
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <form action="/chess/reset" method="post">
+            <button class="reset">New Game</button>
+        </form>
+
+        <a class="back" href="/">Back to Games</a>
+    </div>
+</body>
+</html>
