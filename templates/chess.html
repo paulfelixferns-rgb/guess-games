@@ -29,13 +29,25 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 32px;
+            font-size: 30px;
         }
-        .light {
-            background: #f0d9b5;
+        .light { background: #f0d9b5; }
+        .dark { background: #b58863; }
+        .selected {
+            outline: 3px solid #2563eb;
+            outline-offset: -3px;
         }
-        .dark {
-            background: #b58863;
+        .legal {
+            outline: 3px solid #16a34a;
+            outline-offset: -3px;
+        }
+        .square-button {
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            border: none;
+            font-size: 30px;
+            cursor: pointer;
         }
         .levels {
             display: flex;
@@ -97,10 +109,29 @@
             {% for row in range(8) %}
                 {% for column in range(8) %}
                     {% set square = (7 - row) * 8 + column %}
-                    <div class="square {% if (row + column) % 2 == 0 %}light{% else %}dark{% endif %}">
-                        {% set piece = board.piece_at(square) %}
-                        {% if piece %}
-                            {{ piece.unicode_symbol() }}
+                    {% set piece = board.piece_at(square) %}
+                    {% set is_light = (row + column) % 2 == 0 %}
+
+                    <div class="square {% if is_light %}light{% else %}dark{% endif %} {% if square == selected %}selected{% endif %} {% if square in legal_moves %}legal{% endif %}">
+
+                        {% if square in legal_moves %}
+                            <form action="/chess/move/{{ square }}?selected={{ selected }}" method="get">
+                                <button class="square-button">
+                                    {% if piece %}{{ piece.unicode_symbol() }}{% endif %}
+                                </button>
+                            </form>
+
+                        {% elif piece and piece.color == chess.WHITE and not game_over %}
+                            <form action="/chess/select/{{ square }}" method="get">
+                                <button class="square-button">
+                                    {{ piece.unicode_symbol() }}
+                                </button>
+                            </form>
+
+                        {% else %}
+                            <span>
+                                {% if piece %}{{ piece.unicode_symbol() }}{% endif %}
+                            </span>
                         {% endif %}
                     </div>
                 {% endfor %}
