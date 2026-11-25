@@ -1,15 +1,28 @@
 import random
 from fastapi import FastAPI, Request, Form
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
-app = FastAPI(title="Guess the Number")
+app = FastAPI(title="Games")
 templates = Jinja2Templates(directory="templates")
 
+# Guess the Number
 secret_number = random.randint(1, 100)
 attempts = 0
-message = ""
+message = "Guess a number from 1 to 100."
 game_won = False
+
+# Tic Tac Toe
+board = [""] * 9
+current_player = "X"
+winner = None
+game_over = False
+
+WINNING_COMBINATIONS = [
+    [0, 1, 2], [3, 4, 5], [6, 7, 8],
+    [0, 3, 6], [1, 4, 7], [2, 5, 8],
+    [0, 4, 8], [2, 4, 6]
+]
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
@@ -20,7 +33,11 @@ async def home(request: Request):
             "request": request,
             "message": message,
             "attempts": attempts,
-            "game_won": game_won
+            "game_won": game_won,
+            "board": board,
+            "current_player": current_player,
+            "winner": winner,
+            "game_over": game_over
         }
     )
 
@@ -47,7 +64,11 @@ async def guess(request: Request, number: int = Form(...)):
             "request": request,
             "message": message,
             "attempts": attempts,
-            "game_won": game_won
+            "game_won": game_won,
+            "board": board,
+            "current_player": current_player,
+            "winner": winner,
+            "game_over": game_over
         }
     )
 
@@ -66,6 +87,40 @@ async def new_game(request: Request):
             "request": request,
             "message": message,
             "attempts": attempts,
-            "game_won": game_won
+            "game_won": game_won,
+            "board": board,
+            "current_player": current_player,
+            "winner": winner,
+            "game_over": game_over
         }
     )
+
+@app.post("/move/{position}")
+async def move(request: Request, position: int):
+    global current_player, winner, game_over
+
+    if not game_over and board[position] == "":
+        board[position] = current_player
+
+        for a, b, c in WINNING_COMBINATIONS:
+            if board[a] and board[a] == board[b] == board[c]:
+                winner = board[a]
+                game_over = True
+
+        if not game_over and "" not in board:
+            winner = "Draw"
+            game_over = True
+
+        if not game_over:
+            current_player = "O" if current_player == "X" else "X"
+
+    return RedirectResponse(url="/", status_code=303)
+
+@app.post("/reset")
+async def reset_game():
+    global board, current_player, winner, game_over
+    board = [""] * 9
+    current_player = "X"
+    winner = None
+    game_over = False
+    return RedirectResponse(url="/", status_code=303)
