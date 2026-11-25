@@ -29,15 +29,19 @@ async def home(request: Request):
     return templates.TemplateResponse(
         request=request,
         name="index.html",
+        context={"request": request}
+    )
+
+@app.get("/guess", response_class=HTMLResponse)
+async def guess_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="guess.html",
         context={
             "request": request,
             "message": message,
             "attempts": attempts,
-            "game_won": game_won,
-            "board": board,
-            "current_player": current_player,
-            "winner": winner,
-            "game_over": game_over
+            "game_won": game_won
         }
     )
 
@@ -59,35 +63,31 @@ async def guess(request: Request, number: int = Form(...)):
 
     return templates.TemplateResponse(
         request=request,
-        name="index.html",
+        name="guess.html",
         context={
             "request": request,
             "message": message,
             "attempts": attempts,
-            "game_won": game_won,
-            "board": board,
-            "current_player": current_player,
-            "winner": winner,
-            "game_over": game_over
+            "game_won": game_won
         }
     )
 
-@app.post("/new", response_class=HTMLResponse)
-async def new_game(request: Request):
+@app.post("/guess/new")
+async def new_guess_game():
     global secret_number, attempts, message, game_won
     secret_number = random.randint(1, 100)
     attempts = 0
     message = "New game started. Guess a number from 1 to 100."
     game_won = False
+    return RedirectResponse(url="/guess", status_code=303)
 
+@app.get("/tic-tac-toe", response_class=HTMLResponse)
+async def tic_tac_toe_page(request: Request):
     return templates.TemplateResponse(
         request=request,
-        name="index.html",
+        name="tictactoe.html",
         context={
             "request": request,
-            "message": message,
-            "attempts": attempts,
-            "game_won": game_won,
             "board": board,
             "current_player": current_player,
             "winner": winner,
@@ -95,7 +95,7 @@ async def new_game(request: Request):
         }
     )
 
-@app.post("/move/{position}")
+@app.post("/tic-tac-toe/move/{position}")
 async def move(request: Request, position: int):
     global current_player, winner, game_over
 
@@ -114,13 +114,13 @@ async def move(request: Request, position: int):
         if not game_over:
             current_player = "O" if current_player == "X" else "X"
 
-    return RedirectResponse(url="/", status_code=303)
+    return RedirectResponse(url="/tic-tac-toe", status_code=303)
 
-@app.post("/reset")
+@app.post("/tic-tac-toe/reset")
 async def reset_game():
     global board, current_player, winner, game_over
     board = [""] * 9
     current_player = "X"
     winner = None
     game_over = False
-    return RedirectResponse(url="/", status_code=303)
+    return RedirectResponse(url="/tic-tac-toe", status_code=303)
