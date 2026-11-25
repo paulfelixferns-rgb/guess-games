@@ -386,7 +386,10 @@ async def flip_coin():
 
 @app.get("/quiz", response_class=HTMLResponse)
 async def quiz_page(request: Request):
-    question = quiz_questions[quiz_index]
+    question = None
+
+    if not quiz_finished:
+        question = quiz_questions[quiz_index]
 
     return templates.TemplateResponse(
         request=request,
