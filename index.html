@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Games</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #d9f2d9;
+            text-align: center;
+            padding: 40px;
+        }
+        h1 {
+            color: #14532d;
+        }
+        .games {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            max-width: 500px;
+            margin: 40px auto;
+        }
+        a {
+            display: block;
+            padding: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+            border-radius: 14px;
+        }
+        .guess {
+            background: #2563eb;
+        }
+        .tictactoe {
+            background: #16a34a;
+        }
+        .rps {
+            background: #f59e0b;
+        }
+        .dice {
+            background: #7c3aed;
+        }
+        .coin {
+            background: #0ea5e9;
+        }
+
+        .memory {
+            background: #ec4899;
+        }
+
+        .quiz {
+            background: #f97316;
+        }
+
+        .maze {
+            background: #64748b;
+        }
+        @media (max-width: 500px) {
+            .games {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>My Games</h1>
+    <p>Select a game to play</p>
+
+    <div class="games">
+        <a class="guess" href="/guess">Guess the Number</a>
+        <a class="tictactoe" href="/tic-tac-toe">Tic Tac Toe</a>
+        <a class="rps" href="/rock-paper-scissors">Rock Paper Scissors</a>
+        <a class="dice" href="/dice">Dice Roller</a>
+        <a class="coin" href="/coin-toss">Coin Toss</a>
+        <a class="memory" href="/memory-match">Memory Match</a>
+        <a class="quiz" href="/quiz">Quiz Game</a>
+        <a class="maze" href="/maze">Maze Game</a>
+    </div>
+</body>
+</html>

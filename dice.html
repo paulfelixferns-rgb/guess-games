@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dice Roller</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #d9f2d9;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 420px;
+            margin: auto;
+        }
+
+        .dice-area {
+            perspective: 800px;
+            margin: 40px 0;
+        }
+
+        .cube {
+            width: 100px;
+            height: 100px;
+            position: relative;
+            margin: auto;
+            transform-style: preserve-3d;
+            transform: rotateX(-20deg) rotateY(20deg);
+            transition: transform 1s ease-out;
+        }
+
+        .face {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: white;
+            border: 3px solid #7c3aed;
+            border-radius: 12px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            padding: 12px;
+            box-sizing: border-box;
+        }
+
+        .dot {
+            width: 16px;
+            height: 16px;
+            background: #7c3aed;
+            border-radius: 50%;
+            place-self: center;
+        }
+
+        .front { transform: translateZ(50px); }
+        .back { transform: rotateY(180deg) translateZ(50px); }
+        .right { transform: rotateY(90deg) translateZ(50px); }
+        .left { transform: rotateY(-90deg) translateZ(50px); }
+        .top { transform: rotateX(90deg) translateZ(50px); }
+        .bottom { transform: rotateX(-90deg) translateZ(50px); }
+
+        .rolling {
+            animation: roll 1s ease-out;
+        }
+
+        @keyframes roll {
+            0% {
+                transform: rotateX(0deg) rotateY(0deg);
+            }
+            100% {
+                transform: rotateX(720deg) rotateY(720deg);
+            }
+        }
+
+        button {
+            padding: 15px 25px;
+            font-size: 18px;
+            border: none;
+            border-radius: 10px;
+            background: #7c3aed;
+            color: white;
+            cursor: pointer;
+        }
+
+        .message {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .back {
+            display: inline-block;
+            margin-top: 20px;
+            color: #2563eb;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Dice Roller</h1>
+
+        <div class="dice-area">
+            <div class="cube" id="dice">
+                <div class="face front">
+                    <span class="dot"></span>
+                </div>
+
+                <div class="face back">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+
+                <div class="face right">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+
+                <div class="face left">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+
+                <div class="face top">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+
+                <div class="face bottom">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+            </div>
+        </div>
+
+        <p class="message">{{ dice_message }}</p>
+
+        <form action="/dice/roll" method="post">
+            <button type="submit">Roll Dice</button>
+        </form>
+
+        <a class="back" href="/">Back to Games</a>
+    </div>
+
+    <script>
+        const dice = document.getElementById("dice");
+
+        dice.classList.add("rolling");
+
+        setTimeout(() => {
+            dice.classList.remove("rolling");
+        }, 1000);
+    </script>
+</body>
+</html>

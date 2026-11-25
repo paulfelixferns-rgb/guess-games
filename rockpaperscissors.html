@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Rock Paper Scissors</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #d9f2d9;
+            text-align: center;
+            padding: 40px;
+        }
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 420px;
+            margin: auto;
+        }
+        button {
+            padding: 15px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 10px;
+            background: #f59e0b;
+            color: white;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .result {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .back {
+            display: inline-block;
+            margin-top: 20px;
+            color: #2563eb;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Rock Paper Scissors</h1>
+
+        <p class="result">{{ result }}</p>
+
+        {% if player_choice %}
+            <p>You chose: <strong>{{ player_choice }}</strong></p>
+            <p>Computer chose: <strong>{{ computer_choice }}</strong></p>
+        {% endif %}
+
+        <form action="/rock-paper-scissors/play" method="post">
+            <button name="choice" value="Rock">Rock</button>
+            <button name="choice" value="Paper">Paper</button>
+            <button name="choice" value="Scissors">Scissors</button>
+        </form>
+
+        <a class="back" href="/">Back to Games</a>
+    </div>
+</body>
+</html>
