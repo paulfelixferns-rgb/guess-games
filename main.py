@@ -1,3 +1,4 @@
+import chess
 import random
 from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -66,6 +67,12 @@ WINNING_COMBINATIONS = [
     [0, 3, 6], [1, 4, 7], [2, 5, 8],
     [0, 4, 8], [2, 4, 6]
 ]
+
+# Chess
+chess_board = chess.Board()
+chess_difficulty = "easy"
+chess_message = "You are White. Select a piece, then select a square."
+chess_game_over = False
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
@@ -189,96 +196,40 @@ def available_moves():
     return [i for i, cell in enumerate(board) if cell == ""]
 
 
-def computer_move():
-    global winner, game_over
+def find_winning_move(player):
+    for position in available_moves():
+        board[position] = player
 
-    if game_over:
-        return
+        for a, b, c in WINNING_COMBINATIONS:
+            if board[a] == board[b] == board[c] == player:
+                board[position] = ""
+                return position
 
-    if tic_tac_toe_difficulty == "easy":
-        position = random.choice(available_moves())
-        board[position] = "O"
-        check_tic_tac_toe_winner()
-        return
-
-    if tic_tac_toe_difficulty == "medium":
-        if random.random() < 0.3:
-            position = random.choice(available_moves())
-            board[position] = "O"
-            check_tic_tac_toe_winner()
-            return
-
-    winning_move = find_best_move("O")
-    if winning_move is not None:
-        board[winning_move] = "O"
-        check_tic_tac_toe_winner()
-        return
-
-    blocking_move = find_best_move("X")
-    if blocking_move is not None:
-        board[blocking_move] = "O"
-        check_tic_tac_toe_winner()
-        return
-
-    if tic_tac_toe_difficulty == "hard":
-        best_score = -2
-        best_move = None
-
-        for position in available_moves():
-            board[position] = "O"
-            score = minimax(False)
-            board[position] = ""
-
-            if score > best_score:
-                best_score = score
-                best_move = position
-
-        board[best_move] = "O"
-    else:
-        position = random.choice(available_moves())
-        board[position] = "O"
-
-    check_tic_tac_toe_winner()
-
-
-def find_best_move(player):
-    for a, b, c in WINNING_COMBINATIONS:
-        values = [board[a], board[b], board[c]]
-
-        if values.count(player) == 2 and values.count("") == 1:
-            if board[a] == "":
-                return a
-            if board[b] == "":
-                return b
-            if board[c] == "":
-                return c
+        board[position] = ""
 
     return None
 
 
-def minimax(is_computer_turn):
-    if winner == "O":
+def minimax(current_player):
+    winner_result = get_winner_without_changing_state()
+
+    if winner_result == "O":
         return 1
-    if winner == "X":
+    if winner_result == "X":
         return -1
-    if winner == "Draw":
-        return 0
 
     moves = available_moves()
 
     if not moves:
         return 0
 
-    if is_computer_turn:
+    if current_player == "O":
         best_score = -2
 
         for position in moves:
             board[position] = "O"
-            check_tic_tac_toe_winner()
-            score = minimax(False)
+            score = minimax("X")
             board[position] = ""
-            winner = None
-            game_over = False
 
             best_score = max(best_score, score)
 
@@ -288,16 +239,80 @@ def minimax(is_computer_turn):
 
     for position in moves:
         board[position] = "X"
-        check_tic_tac_toe_winner()
-        score = minimax(True)
+        score = minimax("O")
         board[position] = ""
-        winner = None
-        game_over = False
 
         best_score = min(best_score, score)
 
     return best_score
 
+
+def get_winner_without_changing_state():
+    for a, b, c in WINNING_COMBINATIONS:
+        if board[a] and board[a] == board[b] == board[c]:
+            return board[a]
+
+    if "" not in board:
+        return "Draw"
+
+    return None
+
+
+def computer_move():
+    global winner, game_over
+
+    if game_over:
+        return
+
+    moves = available_moves()
+
+    if not moves:
+        return
+
+    if tic_tac_toe_difficulty == "easy":
+        position = random.choice(moves)
+
+    elif tic_tac_toe_difficulty == "medium":
+        winning_move = find_winning_move("O")
+
+        if winning_move is not None:
+            position = winning_move
+        else:
+            blocking_move = find_winning_move("X")
+
+            if blocking_move is not None:
+                position = blocking_move
+            elif random.random() < 0.3:
+                position = random.choice(moves)
+            else:
+                position = random.choice(moves)
+
+    else:
+        winning_move = find_winning_move("O")
+
+        if winning_move is not None:
+            position = winning_move
+        else:
+            blocking_move = find_winning_move("X")
+
+            if blocking_move is not None:
+                position = blocking_move
+            else:
+                best_score = -2
+                position = moves[0]
+
+                for move_position in moves:
+                    board[move_position] = "O"
+                    score = minimax("X")
+                    board[move_position] = ""
+
+                    if score > best_score:
+                        best_score = score
+                        position = move_position
+
+    board[position] = "O"
+    check_tic_tac_toe_winner()
+    
 @app.get("/rock-paper-scissors", response_class=HTMLResponse)
 async def rock_paper_scissors_page(request: Request):
     return templates.TemplateResponse(
@@ -432,3 +447,30 @@ async def maze_page(request: Request):
         name="maze.html",
         context={"request": request}
     )
+@app.get("/chess", response_class=HTMLResponse)
+async def chess_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="chess.html",
+        context={
+            "request": request,
+            "board": chess_board,
+            "message": chess_message,
+            "difficulty": chess_difficulty,
+            "game_over": chess_game_over
+        }
+    )
+
+@app.post("/chess/difficulty")
+async def set_chess_difficulty(request: Request, difficulty: str = Form(...)):
+    global chess_difficulty
+    chess_difficulty = difficulty
+    return RedirectResponse(url="/chess", status_code=303)
+
+@app.post("/chess/reset")
+async def reset_chess():
+    global chess_board, chess_message, chess_game_over
+    chess_board = chess.Board()
+    chess_message = "New chess game started. You are White."
+    chess_game_over = False
+    return RedirectResponse(url="/chess", status_code=303)
