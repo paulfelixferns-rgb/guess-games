@@ -476,18 +476,19 @@ async def chess_page(request: Request):
             selected = None
 
     return templates.TemplateResponse(
-        request=request,
-        name="chess.html",
-        context={
-            "request": request,
-            "board": chess_board,
-            "message": chess_message,
-            "difficulty": chess_difficulty,
-            "game_over": chess_game_over,
-            "selected": selected,
-            "legal_moves": legal_moves
-        }
-    )
+    request=request,
+    name="chess.html",
+    context={
+        "request": request,
+        "board": chess_board,
+        "message": chess_message,
+        "difficulty": chess_difficulty,
+        "game_over": chess_game_over,
+        "selected": selected,
+        "legal_moves": legal_moves,
+        "chess": chess
+    }
+)
 
 @app.post("/chess/difficulty")
 async def set_chess_difficulty(request: Request, difficulty: str = Form(...)):
