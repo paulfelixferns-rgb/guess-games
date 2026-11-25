@@ -17,6 +17,7 @@ board = [""] * 9
 current_player = "X"
 winner = None
 game_over = False
+tic_tac_toe_difficulty = "easy"
 
 # Rock Paper Scissors
 rps_player_choice = ""
@@ -133,28 +134,30 @@ async def tic_tac_toe_page(request: Request):
             "board": board,
             "current_player": current_player,
             "winner": winner,
-            "game_over": game_over
+            "game_over": game_over,
+            "difficulty": tic_tac_toe_difficulty
         }
     )
 
+@app.post("/tic-tac-toe/difficulty")
+async def set_difficulty(request: Request, difficulty: str = Form(...)):
+    global tic_tac_toe_difficulty
+    tic_tac_toe_difficulty = difficulty
+    return RedirectResponse(url="/tic-tac-toe", status_code=303)
+
 @app.post("/tic-tac-toe/move/{position}")
 async def move(request: Request, position: int):
-    global current_player, winner, game_over
+    global current_player, winner, game_over, tic_tac_toe_difficulty
 
     if not game_over and board[position] == "":
-        board[position] = current_player
-
-        for a, b, c in WINNING_COMBINATIONS:
-            if board[a] and board[a] == board[b] == board[c]:
-                winner = board[a]
-                game_over = True
-
-        if not game_over and "" not in board:
-            winner = "Draw"
-            game_over = True
+        board[position] = "X"
+        check_tic_tac_toe_winner()
 
         if not game_over:
-            current_player = "O" if current_player == "X" else "X"
+            computer_move()
+
+        if not game_over:
+            current_player = "X"
 
     return RedirectResponse(url="/tic-tac-toe", status_code=303)
 
@@ -166,6 +169,134 @@ async def reset_game():
     winner = None
     game_over = False
     return RedirectResponse(url="/tic-tac-toe", status_code=303)
+
+
+def check_tic_tac_toe_winner():
+    global winner, game_over
+
+    for a, b, c in WINNING_COMBINATIONS:
+        if board[a] and board[a] == board[b] == board[c]:
+            winner = board[a]
+            game_over = True
+            return
+
+    if "" not in board:
+        winner = "Draw"
+        game_over = True
+
+
+def available_moves():
+    return [i for i, cell in enumerate(board) if cell == ""]
+
+
+def computer_move():
+    global winner, game_over
+
+    if game_over:
+        return
+
+    if tic_tac_toe_difficulty == "easy":
+        position = random.choice(available_moves())
+        board[position] = "O"
+        check_tic_tac_toe_winner()
+        return
+
+    if tic_tac_toe_difficulty == "medium":
+        if random.random() < 0.3:
+            position = random.choice(available_moves())
+            board[position] = "O"
+            check_tic_tac_toe_winner()
+            return
+
+    winning_move = find_best_move("O")
+    if winning_move is not None:
+        board[winning_move] = "O"
+        check_tic_tac_toe_winner()
+        return
+
+    blocking_move = find_best_move("X")
+    if blocking_move is not None:
+        board[blocking_move] = "O"
+        check_tic_tac_toe_winner()
+        return
+
+    if tic_tac_toe_difficulty == "hard":
+        best_score = -2
+        best_move = None
+
+        for position in available_moves():
+            board[position] = "O"
+            score = minimax(False)
+            board[position] = ""
+
+            if score > best_score:
+                best_score = score
+                best_move = position
+
+        board[best_move] = "O"
+    else:
+        position = random.choice(available_moves())
+        board[position] = "O"
+
+    check_tic_tac_toe_winner()
+
+
+def find_best_move(player):
+    for a, b, c in WINNING_COMBINATIONS:
+        values = [board[a], board[b], board[c]]
+
+        if values.count(player) == 2 and values.count("") == 1:
+            if board[a] == "":
+                return a
+            if board[b] == "":
+                return b
+            if board[c] == "":
+                return c
+
+    return None
+
+
+def minimax(is_computer_turn):
+    if winner == "O":
+        return 1
+    if winner == "X":
+        return -1
+    if winner == "Draw":
+        return 0
+
+    moves = available_moves()
+
+    if not moves:
+        return 0
+
+    if is_computer_turn:
+        best_score = -2
+
+        for position in moves:
+            board[position] = "O"
+            check_tic_tac_toe_winner()
+            score = minimax(False)
+            board[position] = ""
+            winner = None
+            game_over = False
+
+            best_score = max(best_score, score)
+
+        return best_score
+
+    best_score = 2
+
+    for position in moves:
+        board[position] = "X"
+        check_tic_tac_toe_winner()
+        score = minimax(True)
+        board[position] = ""
+        winner = None
+        game_over = False
+
+        best_score = min(best_score, score)
+
+    return best_score
 
 @app.get("/rock-paper-scissors", response_class=HTMLResponse)
 async def rock_paper_scissors_page(request: Request):
@@ -285,6 +416,7 @@ async def quiz_reset():
     quiz_message = "Choose the correct answer."
     quiz_finished = False
     return RedirectResponse(url="/quiz", status_code=303)
+
 @app.get("/memory-match", response_class=HTMLResponse)
 async def memory_match_page(request: Request):
     return templates.TemplateResponse(
