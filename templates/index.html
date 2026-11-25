@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Guess the Number</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            text-align: center;
+            padding: 40px;
+        }
+        .card {
+            background: white;
+            max-width: 420px;
+            margin: auto;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        input {
+            padding: 12px;
+            width: 70%;
+            font-size: 18px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+        button {
+            padding: 12px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            background: #2563eb;
+            color: white;
+            cursor: pointer;
+        }
+        .message {
+            margin: 20px 0;
+            font-size: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Guess the Number</h1>
+        <p>I chose a number from 1 to 100.</p>
+
+        <form action="/guess" method="post">
+            <input type="number" name="number" min="1" max="100" required>
+            <button type="submit">Guess</button>
+        </form>
+
+        <p class="message">{{ message }}</p>
+        <p>Attempts: {{ attempts }}</p>
+
+        <form action="/new" method="post">
+            <button type="submit">New Game</button>
+        </form>
+    </div>
+</body>
+</html>
