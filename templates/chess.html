@@ -115,12 +115,12 @@
                     <div class="square {% if is_light %}light{% else %}dark{% endif %} {% if square == selected %}selected{% endif %} {% if square in legal_moves %}legal{% endif %}">
 
                         {% if square in legal_moves %}
-                            <form action="/chess/move/{{ square }}?selected={{ selected }}" method="get">
-                                <button class="square-button">
-                                    {% if piece %}{{ piece.unicode_symbol() }}{% endif %}
-                                </button>
-                            </form>
-
+    <form action="/chess/move/{{ square }}" method="get">
+        <input type="hidden" name="selected" value="{{ selected }}">
+        <button class="square-button">
+            {% if piece %}{{ piece.unicode_symbol() }}{% endif %}
+        </button>
+    </form>
                         {% elif piece and piece.color == chess.WHITE and not game_over %}
                             <form action="/chess/select/{{ square }}" method="get">
                                 <button class="square-button">
