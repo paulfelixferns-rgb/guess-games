@@ -18,6 +18,15 @@ current_player = "X"
 winner = None
 game_over = False
 
+# Rock Paper Scissors
+rps_player_choice = ""
+rps_computer_choice = ""
+rps_result = ""
+
+# Dice Roller
+dice_result = 0
+dice_message = "Click Roll Dice to play."
+
 WINNING_COMBINATIONS = [
     [0, 1, 2], [3, 4, 5], [6, 7, 8],
     [0, 3, 6], [1, 4, 7], [2, 5, 8],
@@ -124,3 +133,56 @@ async def reset_game():
     winner = None
     game_over = False
     return RedirectResponse(url="/tic-tac-toe", status_code=303)
+
+@app.get("/rock-paper-scissors", response_class=HTMLResponse)
+async def rock_paper_scissors_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="rockpaperscissors.html",
+        context={
+            "request": request,
+            "player_choice": rps_player_choice,
+            "computer_choice": rps_computer_choice,
+            "result": rps_result
+        }
+    )
+
+@app.post("/rock-paper-scissors/play")
+async def play_rock_paper_scissors(request: Request, choice: str = Form(...)):
+    global rps_player_choice, rps_computer_choice, rps_result
+
+    choices = ["Rock", "Paper", "Scissors"]
+    rps_player_choice = choice
+    rps_computer_choice = random.choice(choices)
+
+    if rps_player_choice == rps_computer_choice:
+        rps_result = "It is a draw!"
+    elif (
+        (rps_player_choice == "Rock" and rps_computer_choice == "Scissors") or
+        (rps_player_choice == "Paper" and rps_computer_choice == "Rock") or
+        (rps_player_choice == "Scissors" and rps_computer_choice == "Paper")
+    ):
+        rps_result = "You win!"
+    else:
+        rps_result = "Computer wins!"
+
+    return RedirectResponse(url="/rock-paper-scissors", status_code=303)
+
+@app.get("/dice", response_class=HTMLResponse)
+async def dice_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="dice.html",
+        context={
+            "request": request,
+            "dice_result": dice_result,
+            "dice_message": dice_message
+        }
+    )
+
+@app.post("/dice/roll")
+async def roll_dice():
+    global dice_result, dice_message
+    dice_result = random.randint(1, 6)
+    dice_message = f"You rolled {dice_result}!"
+    return RedirectResponse(url="/dice", status_code=303)
