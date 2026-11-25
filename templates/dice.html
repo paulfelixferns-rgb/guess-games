@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dice Roller</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #d9f2d9;
+            text-align: center;
+            padding: 40px;
+        }
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 420px;
+            margin: auto;
+        }
+        .dice {
+            font-size: 80px;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #7c3aed;
+        }
+        button {
+            padding: 15px 25px;
+            font-size: 18px;
+            border: none;
+            border-radius: 10px;
+            background: #7c3aed;
+            color: white;
+            cursor: pointer;
+        }
+        .back {
+            display: inline-block;
+            margin-top: 20px;
+            color: #2563eb;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Dice Roller</h1>
+
+        <p class="dice">
+            {% if dice_result %}
+                {{ dice_result }}
+            {% else %}
+                🎲
+            {% endif %}
+        </p>
+
+        <p>{{ dice_message }}</p>
+
+        <form action="/dice/roll" method="post">
+            <button type="submit">Roll Dice</button>
+        </form>
+
+        <a class="back" href="/">Back to Games</a>
+    </div>
+</body>
+</html>

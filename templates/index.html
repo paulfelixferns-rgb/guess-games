@@ -5,34 +5,45 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: #f4f6f8;
+            background: #d9f2d9;
             text-align: center;
             padding: 40px;
         }
         h1 {
-            color: #1f2937;
+            color: #14532d;
         }
         .games {
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
             gap: 20px;
-            max-width: 350px;
+            max-width: 500px;
             margin: 40px auto;
         }
         a {
             display: block;
-            padding: 20px;
-            font-size: 20px;
+            padding: 25px;
+            font-size: 18px;
             font-weight: bold;
             text-decoration: none;
             color: white;
-            border-radius: 12px;
+            border-radius: 14px;
         }
         .guess {
             background: #2563eb;
         }
         .tictactoe {
             background: #16a34a;
+        }
+        .rps {
+            background: #f59e0b;
+        }
+        .dice {
+            background: #7c3aed;
+        }
+        @media (max-width: 500px) {
+            .games {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -43,6 +54,8 @@
     <div class="games">
         <a class="guess" href="/guess">Guess the Number</a>
         <a class="tictactoe" href="/tic-tac-toe">Tic Tac Toe</a>
+        <a class="rps" href="/rock-paper-scissors">Rock Paper Scissors</a>
+        <a class="dice" href="/dice">Dice Roller</a>
     </div>
 </body>
 </html>
