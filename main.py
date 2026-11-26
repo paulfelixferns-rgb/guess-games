@@ -500,18 +500,11 @@ async def set_chess_difficulty(request: Request, difficulty: str = Form(...)):
 async def select_chess_piece(request: Request, square: int):
     return RedirectResponse(url=f"/chess?selected={square}", status_code=303)
 
-@app.get("/chess/move/{square}")
-async def make_chess_move(request: Request, square: int):
+@app.post("/chess/move/{square}")
+async def make_chess_move(request: Request, square: int, selected: int = Form(...)):
     global chess_board, chess_message, chess_game_over
 
-    selected_square = request.query_params.get("selected")
-
-    if selected_square is None:
-        return RedirectResponse(url="/chess", status_code=303)
-
-    selected_square = int(selected_square)
-
-    move = chess.Move(selected_square, square)
+    move = chess.Move(selected, square)
 
     if move in chess_board.legal_moves:
         chess_board.push(move)
