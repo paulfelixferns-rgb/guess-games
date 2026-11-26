@@ -500,33 +500,6 @@ async def set_chess_difficulty(request: Request, difficulty: str = Form(...)):
 async def select_chess_piece(request: Request, square: int):
     return RedirectResponse(url=f"/chess?selected={square}", status_code=303)
 
-@app.post("/chess/move/{square}")
-async def make_chess_move(request: Request, square: int, selected: int = Form(...)):
-    global chess_board, chess_message, chess_game_over
-
-    move = chess.Move(selected, square)
-
-    if move in chess_board.legal_moves:
-        chess_board.push(move)
-
-        if not chess_board.is_game_over():
-            computer_chess_move()
-
-        if chess_board.is_checkmate():
-            chess_message = "Checkmate! Computer wins."
-            chess_game_over = True
-        elif chess_board.is_stalemate():
-            chess_message = "Stalemate! The game is a draw."
-            chess_game_over = True
-        elif chess_board.is_check():
-            chess_message = "Your king is in check!"
-        else:
-            chess_message = "Your move."
-    else:
-        chess_message = "That is not a legal move. Try again."
-
-    return RedirectResponse(url="/chess", status_code=303)
-
 @app.post("/chess/reset")
 async def reset_chess():
     global chess_board, chess_message, chess_game_over
