@@ -74,14 +74,20 @@
         }
 
         .square-button {
-            width: 100%;
-            height: 100%;
-            background: transparent;
-            border: none;
-            font-size: inherit;
-            cursor: pointer;
-            padding: 0;
-        }
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    font-size: inherit;
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    padding: 0;
+}
+        
 
         .levels {
             display: flex;
@@ -156,14 +162,13 @@
 
                     <div class="square {% if is_light %}light{% else %}dark{% endif %} {% if square == selected %}selected{% endif %} {% if square in legal_moves %}legal{% endif %}">
 
-                        {% if square in legal_moves %}
-    <form action="/chess/move/{{ square }}" method="post">
-        <input type="hidden" name="selected" value="{{ selected }}">
-        <button class="square-button">
-            {% if piece %}{{ piece.unicode_symbol() }}{% endif %}
-        </button>
-    </form>
-                        {% elif piece and piece.color == chess.WHITE and not game_over %}
+   {% if square in legal_moves %}
+    <a class="square-button"
+       href="/chess/move/{{ square }}?selected={{ selected }}">
+        {% if piece %}{{ piece.unicode_symbol() }}{% endif %}
+    </a>
+
+    {% elif piece and piece.color == chess.WHITE and not game_over %}
                             <form action="/chess/select/{{ square }}" method="get">
                                 <button class="square-button">
                                     {{ piece.unicode_symbol() }}
