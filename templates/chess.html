@@ -1,83 +1,125 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chess</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: Arial, sans-serif;
             background: #d9f2d9;
             text-align: center;
-            padding: 30px;
+            padding: 8px;
+            margin: 0;
         }
+
         .card {
             background: white;
-            padding: 20px;
+            padding: 10px;
             border-radius: 16px;
-            max-width: 480px;
+            max-width: 99%;
             margin: auto;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
+
+        h1 {
+            font-size: 24px;
+            margin: 8px 0;
+        }
+
+        p {
+            font-size: 16px;
+            margin: 6px 0;
+        }
+
         .board {
             display: grid;
-            grid-template-columns: repeat(8, 44px);
-            justify-content: center;
-            margin: 20px auto;
+            grid-template-columns: repeat(8, 1fr);
+            width: min(98vw, 500px);
+            aspect-ratio: 1 / 1;
+            margin: 12px auto;
+            border: 4px solid #111827;
+            border-radius: 8px;
+            overflow: hidden;
         }
+
         .square {
-            width: 44px;
-            height: 44px;
+            width: 100%;
+            height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 30px;
+            font-size: clamp(24px, 8vw, 44px);
         }
-        .light { background: #f0d9b5; }
-        .dark { background: #b58863; }
+
+        .light {
+            background: #f0d9b5;
+        }
+
+        .dark {
+            background: #b58863;
+        }
+
         .selected {
-            outline: 3px solid #2563eb;
-            outline-offset: -3px;
+            outline: 4px solid #2563eb;
+            outline-offset: -4px;
         }
+
         .legal {
-            outline: 3px solid #16a34a;
-            outline-offset: -3px;
+            outline: 4px solid #16a34a;
+            outline-offset: -4px;
         }
+
         .square-button {
             width: 100%;
             height: 100%;
             background: transparent;
             border: none;
-            font-size: 30px;
+            font-size: inherit;
             cursor: pointer;
+            padding: 0;
         }
+
         .levels {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 8px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
         }
+
         .levels button {
             padding: 12px 18px;
+            font-size: 15px;
             font-weight: bold;
             border: 2px solid #111827;
             border-radius: 8px;
             background: white;
             cursor: pointer;
         }
+
         .levels button.active {
             background: #111827;
             color: white;
         }
+
         button.reset {
-            padding: 12px 20px;
+            padding: 14px 24px;
+            font-size: 17px;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             background: #16a34a;
             color: white;
             cursor: pointer;
         }
+
         .back {
             display: inline-block;
-            margin-top: 20px;
+            margin-top: 14px;
+            font-size: 17px;
             color: #2563eb;
             text-decoration: none;
         }
@@ -115,12 +157,13 @@
                     <div class="square {% if is_light %}light{% else %}dark{% endif %} {% if square == selected %}selected{% endif %} {% if square in legal_moves %}legal{% endif %}">
 
                         {% if square in legal_moves %}
-    <form action="/chess/move/{{ square }}" method="get">
-        <input type="hidden" name="selected" value="{{ selected }}">
-        <button class="square-button">
-            {% if piece %}{{ piece.unicode_symbol() }}{% endif %}
-        </button>
-    </form>
+                            <form action="/chess/move/{{ square }}" method="get">
+                                <input type="hidden" name="selected" value="{{ selected }}">
+                                <button class="square-button">
+                                    {% if piece %}{{ piece.unicode_symbol() }}{% endif %}
+                                </button>
+                            </form>
+
                         {% elif piece and piece.color == chess.WHITE and not game_over %}
                             <form action="/chess/select/{{ square }}" method="get">
                                 <button class="square-button">

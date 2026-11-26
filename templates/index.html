@@ -1,66 +1,72 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Games</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: Arial, sans-serif;
             background: #d9f2d9;
             text-align: center;
-            padding: 40px;
+            padding: 10px;
+            margin: 0;
         }
+
         h1 {
             color: #14532d;
+            font-size: 28px;
+            margin: 15px 0 5px;
         }
+
+        p {
+            font-size: 17px;
+        }
+
         .games {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            max-width: 500px;
-            margin: 40px auto;
+            gap: 10px;
+            width: 100%;
+            max-width: 760px;
+            margin: 20px auto;
         }
+
         a {
-            display: block;
-            padding: 25px;
-            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 90px;
+            padding: 15px;
+            font-size: 17px;
             font-weight: bold;
             text-decoration: none;
             color: white;
             border-radius: 14px;
-        }
-        .guess {
-            background: #2563eb;
-        }
-        .tictactoe {
-            background: #16a34a;
-        }
-        .rps {
-            background: #f59e0b;
-        }
-        .dice {
-            background: #7c3aed;
-        }
-        .coin {
-            background: #0ea5e9;
+            text-align: center;
         }
 
-        .memory {
-            background: #ec4899;
-        }
+        .guess { background: #2563eb; }
+        .tictactoe { background: #16a34a; }
+        .rps { background: #f59e0b; }
+        .dice { background: #7c3aed; }
+        .coin { background: #0ea5e9; }
+        .memory { background: #ec4899; }
+        .quiz { background: #f97316; }
+        .maze { background: #64748b; }
+        .chess { background: #111827; }
 
-        .quiz {
-            background: #f97316;
-        }
-
-        .maze {
-            background: #64748b;
-        }
-        .chess {
-    background: #111827;
-}
-        @media (max-width: 500px) {
+        @media (max-width: 650px) {
             .games {
                 grid-template-columns: 1fr;
+            }
+
+            a {
+                min-height: 72px;
+                font-size: 18px;
             }
         }
     </style>
